@@ -8,6 +8,8 @@ type Inputs = {
   ticker: string;
   file: FileList;
   description: string;
+  lat: string;
+  lng: string;
 };
 
 export default () => {
@@ -15,7 +17,7 @@ export default () => {
     control,
     register,
     handleSubmit,
-    watch,
+    setValue,
     formState: { errors },
   } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
@@ -23,8 +25,8 @@ export default () => {
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="grid grid-cols-[250px_1fr] gap-4 mb-4">
-        <div>
+      <div className="grid md:grid-cols-[250px_1fr] gap-4 mb-4">
+        <div className="order-2 md:order-1">
           <ImageDropzoneInput
             errors={errors}
             control={control}
@@ -42,7 +44,7 @@ export default () => {
           </div>
           <strong>Choose location:</strong> */}
         </div>
-        <div>
+        <div className="order-1 md:order-2">
           <label
             className={clsx(
               "input input-bordered flex items-center gap-2 mb-4",
@@ -84,8 +86,12 @@ export default () => {
         </div>
       </div>
 
-      <MapboxPicker />
-
+      <MapboxPicker
+        setValue={setValue}
+        control={control}
+        nameLat="lat"
+        nameLng="lng"
+      />
       <button
         onClick={() => handleSubmit(onSubmit)}
         className="absolute bottom-12 right-8 button-shadow px-4 py-2 text-2xl rounded-md bg-secondary text-secondary-content"

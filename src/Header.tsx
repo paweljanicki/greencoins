@@ -32,7 +32,7 @@ export default () => {
           onClose={() => setIsModalOpen(false)}
           closeOnOutsideClick={false}
         >
-          <div className="w-[800px] h-[500px]">
+          <div className="w-[calc(100vw-32px)] md:w-[80vw] lg:w-[800px] h-[calc(100svh-96px)] md:h-[520px]">
             <CreateGreenCoinForm />
           </div>
         </Modal>

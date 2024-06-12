@@ -16,7 +16,7 @@ export default ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-base-300 rounded-md shadow-lg px-8 py-12 relative"
+        className="bg-base-300 rounded-md shadow-lg px-4 md:px-8 py-12 relative"
       >
         <div
           className="absolute right-4 top-4 cursor-pointer"
@@ -24,7 +24,7 @@ export default ({
         >
           [close]
         </div>
-        {children}
+        <div className="overflow-y-auto">{children}</div>
       </div>
     </div>
   );

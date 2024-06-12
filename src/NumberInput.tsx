@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 
 interface NumberInputProps {
   value: string;
