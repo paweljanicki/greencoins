@@ -24,7 +24,7 @@ export default () => {
 
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form className="relative" onSubmit={handleSubmit(onSubmit)}>
       <div className="grid md:grid-cols-[250px_1fr] gap-4 mb-4">
         <div className="order-2 md:order-1">
           <ImageDropzoneInput
@@ -94,7 +94,7 @@ export default () => {
       />
       <button
         onClick={() => handleSubmit(onSubmit)}
-        className="absolute bottom-12 right-8 button-shadow px-4 py-2 text-2xl rounded-md bg-secondary text-secondary-content"
+        className="absolute bottom-0 right-0 button-shadow px-4 py-2 text-2xl rounded-md bg-secondary text-secondary-content"
       >
         [submit]
       </button>

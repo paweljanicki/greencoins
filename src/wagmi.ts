@@ -6,7 +6,7 @@ export const config = createConfig(
   getDefaultConfig({
     chains: [baseSepolia],
     walletConnectProjectId: import.meta.env.VITE_WC_PROJECT_ID ?? "",
-    appName: "Create Wagmi",
+    appName: "RegenAtlas.fun",
     transports: {
       [baseSepolia.id]: http(
         `https://base-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY_BASE_SEPOLIA}`
