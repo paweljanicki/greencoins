@@ -1,7 +1,7 @@
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 import { Controller, Control } from "react-hook-form";
-import NumberInput from "./NumberInput";
+import { NumberInput } from "./shared/components";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string;
 

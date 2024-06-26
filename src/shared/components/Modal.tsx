@@ -4,7 +4,7 @@ interface ModalProps {
   closeOnOutsideClick?: boolean;
 }
 
-export default ({
+export const Modal = ({
   children,
   onClose,
   closeOnOutsideClick = true,

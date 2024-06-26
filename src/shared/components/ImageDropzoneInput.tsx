@@ -10,7 +10,7 @@ interface ImageDropzoneInputProps {
   required?: boolean;
 }
 
-const ImageDropzoneInput: React.FC<ImageDropzoneInputProps> = ({
+export const ImageDropzoneInput: React.FC<ImageDropzoneInputProps> = ({
   control,
   name,
   errors,
@@ -98,5 +98,3 @@ const DropzoneComponent: React.FC<{
     </div>
   );
 };
-
-export default ImageDropzoneInput;

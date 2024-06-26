@@ -1,16 +1,9 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import clsx from "clsx";
 import MapboxPicker from "./MapboxPicker";
-import ImageDropzoneInput from "./ImageDropzoneInput";
-
-type Inputs = {
-  name: string;
-  ticker: string;
-  file: FileList;
-  description: string;
-  lat: string;
-  lng: string;
-};
+import { ImageDropzoneInput } from "./shared/components";
+import { deployToken } from "./shared/helpers/deployToken";
+import { CreateToken } from "./shared/types";
 
 export default () => {
   const {
@@ -19,8 +12,11 @@ export default () => {
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<Inputs>();
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  } = useForm<CreateToken>();
+  const onSubmit: SubmitHandler<CreateToken> = (data) => {
+    console.log(data);
+    deployToken(data);
+  };
 
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */

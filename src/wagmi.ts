@@ -1,15 +1,15 @@
 import { http, createConfig } from "wagmi";
-import { baseSepolia } from "wagmi/chains";
+import { sepolia } from "wagmi/chains";
 import { getDefaultConfig } from "connectkit";
 
 export const config = createConfig(
   getDefaultConfig({
-    chains: [baseSepolia],
+    chains: [sepolia],
     walletConnectProjectId: import.meta.env.VITE_WC_PROJECT_ID ?? "",
     appName: "RegenAtlas.fun",
     transports: {
-      [baseSepolia.id]: http(
-        `https://base-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY_BASE_SEPOLIA}`
+      [sepolia.id]: http(
+        `https://eth-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY_SEPOLIA}`
       ),
     },
   })

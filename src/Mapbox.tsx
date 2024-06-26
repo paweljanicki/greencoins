@@ -1,5 +1,7 @@
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
+import { getAllTokens } from "./shared/helpers/getAllTokens";
+import { Token } from "./shared/types";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string;
 
@@ -10,11 +12,15 @@ interface MapboxProps {
 }
 
 export default ({ className }: MapboxProps) => {
+  const [allTokens, setAllTokens] = useState<any[]>([]);
+
   const mapContainer = useRef(null);
   const map = useRef<null | mapboxgl.Map>(null);
   const [lng, setLng] = useState<number | string>(20);
   const [lat, setLat] = useState<number | string>(30);
   const [zoom, setZoom] = useState<number | string>(2);
+
+  console.log("allTokens", allTokens);
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -29,14 +35,27 @@ export default ({ className }: MapboxProps) => {
       zoom: typeof zoom === "string" ? parseInt(zoom, 10) : zoom,
     });
 
-    map.current.on("move", () => {
-      if (map.current !== null) {
-        setLng(map.current.getCenter().lng.toFixed(4));
-        setLat(map.current.getCenter().lat.toFixed(4));
-        setZoom(map.current.getZoom().toFixed(2));
+    loadTokens();
+  });
+
+  const loadTokens = async () => {
+    const data = await getAllTokens();
+    setAllTokens(data);
+    addMarkers(data);
+  };
+
+  const addMarkers = (tokens: Token[]) => {
+    tokens.forEach((token) => {
+      if (map.current) {
+        new mapboxgl.Marker()
+          .setLngLat([token.metadata.longitude, token.metadata.latitude])
+          .setPopup(
+            new mapboxgl.Popup().setHTML(`<h1>${token.tokenAddress}</h1>`)
+          )
+          .addTo(map.current);
       }
     });
-  });
+  };
 
   return (
     <div className={className}>

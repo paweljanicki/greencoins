@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ConnectKitButton } from "connectkit";
-import Logo from "./Logo";
-import Modal from "./Modal";
+import { Logo, Modal } from "./shared/components";
 import CreateGreenCoinForm from "./CreateGreenCoinForm";
 
 export default () => {
