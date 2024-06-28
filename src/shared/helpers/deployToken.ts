@@ -14,21 +14,23 @@ const fleekSdk = new FleekSdk({
 });
 
 export const deployToken = async (createToken: CreateToken) => {
+  const symbol = createToken.ticker.toUpperCase();
   const metadata = await getTokenMetadata(createToken);
-  const metadataHash = await getTokenMetadataHash(metadata);
+  const metadataHash = await getTokenMetadataHash(metadata, symbol);
 
   console.log("metadata", metadata);
   console.log("metadataHash", metadataHash);
 
-  await deployTokenViaContract(metadata, metadataHash);
+  await deployTokenViaContract(createToken, metadataHash);
 };
 
-export const getTokenMetadataHash = async (
-  metadata: TokenMetadata
+const getTokenMetadataHash = async (
+  metadata: TokenMetadata,
+  symbol: string
 ): Promise<string> => {
   // Upload metadata to IPFS
 
-  const metadataFile = createJsonFile(metadata, metadata.ticker);
+  const metadataFile = createJsonFile(metadata, symbol);
 
   const metadataResponse = await fleekSdk.storage().uploadFile({
     file: metadataFile,
@@ -39,18 +41,13 @@ export const getTokenMetadataHash = async (
   return metadataResponse.pin.cid;
 };
 
-export const getTokenMetadata = async (
-  token: CreateToken
-): Promise<TokenMetadata> => {
-  const { name, ticker, description, file, lat, lng } = token;
+const getTokenMetadata = async (token: CreateToken): Promise<TokenMetadata> => {
+  const { description, file, lat, lng } = token;
   const image = file[0];
-  const uppercaseTicker = ticker.toUpperCase();
 
   const metadata: TokenMetadata = {
     latitude: parseFloat(lat),
     longitude: parseFloat(lng),
-    name,
-    ticker: uppercaseTicker,
     description,
     imageHash: "",
   };
@@ -68,14 +65,15 @@ export const getTokenMetadata = async (
 };
 
 const deployTokenViaContract = async (
-  metadata: TokenMetadata,
+  createToken: CreateToken,
   metadataHash: string
 ) => {
+  const symbol = createToken.ticker.toUpperCase();
   const { request } = await simulateContract(config, {
     abi: greenLaunchpad,
     address: import.meta.env.VITE_GREEN_LAUNCHPAD_CONTRACT,
     functionName: "deployToken",
-    args: [metadata.name, metadata.ticker, metadataHash, BigInt(1 * 10 ** 27)],
+    args: [createToken.name, symbol, metadataHash, BigInt(1 * 10 ** 27)],
   });
   const hash = await writeContract(config, request);
 

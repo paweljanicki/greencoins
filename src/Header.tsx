@@ -2,29 +2,36 @@ import { useState } from "react";
 import { ConnectKitButton } from "connectkit";
 import { Logo, Modal } from "./shared/components";
 import CreateGreenCoinForm from "./CreateGreenCoinForm";
+import { Link } from "react-router-dom";
 
-export default () => {
+interface HeaderProps {
+  showCreate?: boolean;
+}
+
+export default ({ showCreate = true }: HeaderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
       <header className="site-header flex flex-col fixed top-0 left-0 w-full z-40 p-4">
         <div className="flex justify-between">
-          <div className="">
+          <Link to="/">
             <Logo />
-          </div>
+          </Link>
           <div>
             <ConnectKitButton />
           </div>
         </div>
-        <div className="flex justify-center">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="button-shadow px-4 py-2 text-2xl rounded-md bg-secondary text-secondary-content"
-          >
-            [create a green coin]
-          </button>
-        </div>
+        {showCreate && (
+          <div className="flex justify-center">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="button-shadow px-4 py-2 text-2xl rounded-md bg-secondary text-secondary-content"
+            >
+              [create a green coin]
+            </button>
+          </div>
+        )}
       </header>
       {isModalOpen && (
         <Modal

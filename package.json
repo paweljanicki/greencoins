@@ -21,6 +21,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.51.5",
+    "react-router-dom": "^6.24.0",
     "uuid": "^10.0.0",
     "viem": "latest",
     "wagmi": "latest"

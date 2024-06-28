@@ -2,13 +2,13 @@ import { Address, createPublicClient, http } from "viem";
 import { sepolia } from "viem/chains";
 import { greenLaunchpad } from "../../abi/GreenLaunchpad";
 import { GreenERC20 } from "../../abi/GreenERC20";
-import { getIpfsLink } from "./getIpfsLink";
-import { Token } from "../types";
+import { TokenDeployedEvent, TokenDetails, TokenMetadata } from "../types";
 import { GreenCurve } from "../../abi/GreenCurve";
 import { formatBigInt } from "./formatBigInt";
 import { DECIMALS, MARKET_CAP_DECIMALS } from "../consts";
+import { getTokenMetadata } from "./getTokenMetadata";
 
-export const getAllTokens = async (): Promise<Token[]> => {
+export const getAllTokens = async (): Promise<TokenDetails[]> => {
   const client = createPublicClient({
     chain: sepolia,
     transport: http(
@@ -16,7 +16,11 @@ export const getAllTokens = async (): Promise<Token[]> => {
     ),
   });
 
-  const getTokenDeployedEvents = async (): Promise<Array<any>> => {
+  const getTokenDeployedEvents = async (): Promise<
+    Array<{
+      args: TokenDeployedEvent;
+    }>
+  > => {
     const tokenDeployedEvents = await client.getContractEvents({
       address: import.meta.env.VITE_GREEN_LAUNCHPAD_CONTRACT,
       abi: greenLaunchpad,
@@ -26,7 +30,9 @@ export const getAllTokens = async (): Promise<Token[]> => {
 
     console.log("tokenDeployedEvents", tokenDeployedEvents);
 
-    return tokenDeployedEvents;
+    return tokenDeployedEvents as Array<{
+      args: TokenDeployedEvent;
+    }>;
   };
 
   const getDeployedTokens = async () => {
@@ -34,67 +40,53 @@ export const getAllTokens = async (): Promise<Token[]> => {
 
     const tokens = [];
     for (const event of events) {
-      let metadata;
+      let metadata: TokenMetadata | null;
       try {
-        metadata = await getTokenMetadataHash(event.args.tokenAddress);
+        metadata = await getTokenMetadata(client, event.args.tokenAddress);
       } catch {
         metadata = null;
       }
 
-      let name;
-      let ticker;
-      let marketCap;
+      let token: TokenDetails;
+
       if (metadata) {
+        let name: string;
+        let symbol: string;
+        let marketCap: string;
+
         name = await client.readContract({
           address: event.args.tokenAddress,
           abi: GreenERC20,
           functionName: "name",
         });
 
-        ticker = await client.readContract({
+        symbol = await client.readContract({
           address: event.args.tokenAddress,
           abi: GreenERC20,
           functionName: "symbol",
         });
 
         marketCap = await getTokenMarketCap(event.args.greenCurveAddress);
+
+        token = {
+          creator: event.args.creator,
+          tokenAddress: event.args.tokenAddress,
+          greenCurveAddress: event.args.greenCurveAddress,
+          latitude: metadata?.latitude || 0,
+          longitude: metadata?.longitude || 0,
+          imageHash: metadata?.imageHash || "",
+          name,
+          symbol,
+          description: metadata?.description || "",
+          marketCap,
+        };
+        tokens.push(token);
       }
-
-      const token: Token = {
-        ...event.args,
-        metadata: metadata
-          ? {
-              ...metadata,
-              name,
-              ticker,
-              marketCap: marketCap,
-            }
-          : null,
-      };
-
-      tokens.push(token);
     }
 
     const filteredTokens = removeTokensWithBrokenMetadata(tokens);
 
     return filteredTokens;
-  };
-
-  const getTokenMetadataHash = async (tokenAddress: Address) => {
-    const hash = await client.readContract({
-      address: tokenAddress,
-      abi: GreenERC20,
-      functionName: "metadataURI",
-    });
-
-    let response;
-    try {
-      response = await fetch(getIpfsLink(hash));
-    } catch {
-      throw new Error(`Failed to fetch metadata from IPFS: ${hash}`);
-    }
-
-    return await response.json();
   };
 
   const getTokenMarketCap = async (
@@ -109,20 +101,16 @@ export const getAllTokens = async (): Promise<Token[]> => {
     return formatBigInt(marketCap, DECIMALS, MARKET_CAP_DECIMALS);
   };
 
-  const removeTokensWithBrokenMetadata = async (tokens: Token[]) => {
+  const removeTokensWithBrokenMetadata = async (tokens: TokenDetails[]) => {
     const filteredTokens = tokens.filter((token) => {
-      if (!token.metadata) {
-        return false;
-      }
-
       let isValid = true;
 
       if (
-        !token.metadata.name ||
-        !token.metadata.ticker ||
-        !token.metadata.imageHash ||
-        (token.metadata.latitude !== 0 && !token.metadata.latitude) ||
-        (token.metadata.longitude !== 0 && !token.metadata.longitude)
+        !token.name ||
+        !token.symbol ||
+        !token.imageHash ||
+        (token.latitude !== 0 && !token.latitude) ||
+        (token.longitude !== 0 && !token.longitude)
       ) {
         isValid = false;
       }

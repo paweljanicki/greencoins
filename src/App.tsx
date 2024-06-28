@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Events from "./Events";
 import Header from "./Header";
 import Mapbox from "./Mapbox";

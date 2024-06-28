@@ -1,3 +1,12 @@
+import { Address } from "viem";
+
+// Event emitted when token is deployed
+export interface TokenDeployedEvent {
+  creator: Address;
+  tokenAddress: Address;
+  greenCurveAddress: Address;
+}
+
 export interface Token {
   creator: string;
   tokenAddress: string;
@@ -5,16 +14,29 @@ export interface Token {
   metadata: TokenMetadata;
 }
 
+// This goes into a JSON file that is uploaded to IPFS
 export interface TokenMetadata {
   latitude: number;
   longitude: number;
   imageHash: string;
-  name: string;
-  ticker: string;
   description?: string;
-  marketCap?: string;
 }
 
+// This is accumulated data from the contract and IPFS
+export interface TokenDetails {
+  creator: string;
+  tokenAddress: string;
+  greenCurveAddress: string;
+  latitude: number; // from IPFS
+  longitude: number; // from IPFS
+  imageHash: string; // from IPFS
+  name: string; // from GreenERC20 contract
+  symbol: string; // from GreenERC20 contract
+  description?: string; // from IPFS
+  marketCap?: string; // from GreenCurve contract
+}
+
+// This is the data that is used to create a token through the UI
 export interface CreateToken {
   description: string;
   file: FileList;
