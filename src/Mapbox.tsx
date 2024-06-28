@@ -2,6 +2,8 @@ import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 import { getAllTokens } from "./shared/helpers/getAllTokens";
 import { Token } from "./shared/types";
+import TokenPopup from "./TokenPopup";
+import { mapboxPopupContent } from "./shared/others/mapboxPopupContent";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string;
 
@@ -50,7 +52,9 @@ export default ({ className }: MapboxProps) => {
         new mapboxgl.Marker()
           .setLngLat([token.metadata.longitude, token.metadata.latitude])
           .setPopup(
-            new mapboxgl.Popup().setHTML(`<h1>${token.tokenAddress}</h1>`)
+            new mapboxgl.Popup({ className: "token-map-popup" })
+              .setHTML(mapboxPopupContent(token))
+              .setMaxWidth("500px")
           )
           .addTo(map.current);
       }

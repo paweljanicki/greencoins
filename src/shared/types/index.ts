@@ -12,6 +12,7 @@ export interface TokenMetadata {
   name: string;
   ticker: string;
   description?: string;
+  marketCap?: string;
 }
 
 export interface CreateToken {

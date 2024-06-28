@@ -4,6 +4,9 @@ import { greenLaunchpad } from "../../abi/GreenLaunchpad";
 import { GreenERC20 } from "../../abi/GreenERC20";
 import { getIpfsLink } from "./getIpfsLink";
 import { Token } from "../types";
+import { GreenCurve } from "../../abi/GreenCurve";
+import { formatBigInt } from "./formatBigInt";
+import { DECIMALS, MARKET_CAP_DECIMALS } from "../consts";
 
 export const getAllTokens = async (): Promise<Token[]> => {
   const client = createPublicClient({
@@ -40,6 +43,7 @@ export const getAllTokens = async (): Promise<Token[]> => {
 
       let name;
       let ticker;
+      let marketCap;
       if (metadata) {
         name = await client.readContract({
           address: event.args.tokenAddress,
@@ -52,15 +56,18 @@ export const getAllTokens = async (): Promise<Token[]> => {
           abi: GreenERC20,
           functionName: "symbol",
         });
+
+        marketCap = await getTokenMarketCap(event.args.greenCurveAddress);
       }
 
-      const token = {
+      const token: Token = {
         ...event.args,
         metadata: metadata
           ? {
               ...metadata,
               name,
               ticker,
+              marketCap: marketCap,
             }
           : null,
       };
@@ -68,7 +75,7 @@ export const getAllTokens = async (): Promise<Token[]> => {
       tokens.push(token);
     }
 
-    const filteredTokens = tokens.filter((token) => token.metadata !== null);
+    const filteredTokens = removeTokensWithBrokenMetadata(tokens);
 
     return filteredTokens;
   };
@@ -88,6 +95,42 @@ export const getAllTokens = async (): Promise<Token[]> => {
     }
 
     return await response.json();
+  };
+
+  const getTokenMarketCap = async (
+    greenCurveAddress: Address
+  ): Promise<string> => {
+    const marketCap = await client.readContract({
+      address: greenCurveAddress,
+      abi: GreenCurve,
+      functionName: "marketCap",
+    });
+
+    return formatBigInt(marketCap, DECIMALS, MARKET_CAP_DECIMALS);
+  };
+
+  const removeTokensWithBrokenMetadata = async (tokens: Token[]) => {
+    const filteredTokens = tokens.filter((token) => {
+      if (!token.metadata) {
+        return false;
+      }
+
+      let isValid = true;
+
+      if (
+        !token.metadata.name ||
+        !token.metadata.ticker ||
+        !token.metadata.imageHash ||
+        (token.metadata.latitude !== 0 && !token.metadata.latitude) ||
+        (token.metadata.longitude !== 0 && !token.metadata.longitude)
+      ) {
+        isValid = false;
+      }
+
+      return isValid;
+    });
+
+    return filteredTokens;
   };
 
   return await getDeployedTokens();

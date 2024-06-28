@@ -34,3 +34,23 @@
     rgb(0, 0, 0) 0px 0px 0px 2px inset;
   box-sizing: border-box;
 }
+
+.token-map-popup {
+  @apply w-[216px] md:w-[500px];
+}
+
+.token-map-popup .mapboxgl-popup-content {
+  @apply p-2 bg-neutral text-secondary;
+}
+
+.token-map-popup .mapboxgl-popup-tip {
+  @apply !border-t-neutral;
+}
+
+.token-map-popup.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  @apply !border-b-neutral;
+}
+
+.token-map-popup .mapboxgl-popup-close-button {
+  @apply text-3xl leading-[16px] py-1 px-2;
+}
