@@ -5,6 +5,7 @@ import { GreenERC20 } from "../../abi/GreenERC20";
 import { TokenDeployedEvent, TokenDetails, TokenMetadata } from "../types";
 import { getTokenMetadata } from "./getTokenMetadata";
 import { getTokenMarketCap } from "./getTokenMarketCap";
+import { TEST_TOKENS } from "../consts";
 
 export const getAllTokens = async (): Promise<TokenDetails[]> => {
   const client = createPublicClient({
@@ -34,8 +35,12 @@ export const getAllTokens = async (): Promise<TokenDetails[]> => {
   const getDeployedTokens = async () => {
     const events = await getTokenDeployedEvents();
 
+    const filteredEvents = events.filter((event) => {
+      return !TEST_TOKENS.includes(event.args.tokenAddress);
+    });
+
     const tokens = [];
-    for (const event of events) {
+    for (const event of filteredEvents) {
       let metadata: TokenMetadata | null;
       try {
         metadata = await getTokenMetadata(client, event.args.tokenAddress);
