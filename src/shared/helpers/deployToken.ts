@@ -21,7 +21,9 @@ export const deployToken = async (createToken: CreateToken) => {
   console.log("metadata", metadata);
   console.log("metadataHash", metadataHash);
 
-  await deployTokenViaContract(createToken, metadataHash);
+  const hash = await deployTokenViaContract(createToken, metadataHash);
+
+  return hash;
 };
 
 const getTokenMetadataHash = async (
@@ -78,4 +80,6 @@ const deployTokenViaContract = async (
   const hash = await writeContract(config, request);
 
   console.log("hash", hash);
+
+  return hash;
 };

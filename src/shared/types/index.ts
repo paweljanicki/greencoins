@@ -1,4 +1,4 @@
-import { Address } from "viem";
+import { Address, Hash } from "viem";
 
 // Event emitted when token is deployed
 export interface TokenDeployedEvent {
@@ -32,8 +32,10 @@ export interface TokenDetails {
   imageHash: string; // from IPFS
   name: string; // from GreenERC20 contract
   symbol: string; // from GreenERC20 contract
+  totalSupply: string; // from GreenERC20 contract
   description?: string; // from IPFS
   marketCap?: string; // from GreenCurve contract
+  decimals?: number; // from GreenERC20 contract
 }
 
 // This is the data that is used to create a token through the UI
@@ -45,3 +47,33 @@ export interface CreateToken {
   name: string;
   ticker: string;
 }
+
+export interface BuyEvent {
+  type: "buy";
+  address: Address; // GreenCurve contract address
+  args: {
+    buyer: Address;
+    ethIn: bigint;
+    fee: bigint;
+    tokenOut: bigint;
+  };
+  transactionHash: string;
+  blockNumber: bigint;
+}
+
+export interface SellEvent {
+  type: "sell";
+  address: Address; // GreenCurve contract address
+  args: {
+    seller: Address;
+    ethOut: bigint;
+    fee: bigint;
+    tokenIn: bigint;
+  };
+  transactionHash: string;
+  blockNumber: bigint;
+}
+
+export type PurchaseEvent = BuyEvent | SellEvent;
+
+export type TokenPurchases = Array<PurchaseEvent>;

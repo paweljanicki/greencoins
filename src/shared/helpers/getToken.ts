@@ -3,13 +3,14 @@ import { GreenERC20 } from "../../abi/GreenERC20";
 import { getPublicViemClient } from "./getPublicViemClient";
 import { TokenDetails } from "../types";
 import { getTokenMetadata } from "./getTokenMetadata";
+import { getTokenMarketCap } from "./getTokenMarketCap";
 
 export const getTokenDetails = async (
   tokenAddress: string
 ): Promise<TokenDetails> => {
   const client = getPublicViemClient();
 
-  const contract = {
+  const tokenContract = {
     address: tokenAddress as Address,
     abi: GreenERC20,
   };
@@ -17,24 +18,28 @@ export const getTokenDetails = async (
   const results = await client.multicall({
     contracts: [
       {
-        ...contract,
+        ...tokenContract,
         functionName: "name",
       },
       {
-        ...contract,
+        ...tokenContract,
         functionName: "symbol",
       },
       {
-        ...contract,
+        ...tokenContract,
         functionName: "decimals",
       },
       {
-        ...contract,
+        ...tokenContract,
         functionName: "metadataURI",
       },
       {
-        ...contract,
+        ...tokenContract,
         functionName: "greenCurve",
+      },
+      {
+        ...tokenContract,
+        functionName: "totalSupply",
       },
     ],
   });
@@ -43,27 +48,42 @@ export const getTokenDetails = async (
     throw new Error("Failed to fetch token details");
   }
 
-  console.log("results", results);
+  const name = results[0].result;
+  const symbol = results[1].result;
+  const decimals = results[2].result;
+  const metadataURI = results[3].result;
+  const greenCurveAddress = results[4].result as Address;
+  const totalSupply = results[5]?.result?.toString();
+
+  if (
+    !name ||
+    !symbol ||
+    !decimals ||
+    !metadataURI ||
+    !greenCurveAddress ||
+    !totalSupply
+  ) {
+    throw new Error("Failed to fetch token details");
+  }
 
   const tokenMetadata = await getTokenMetadata(client, tokenAddress as Address);
 
-  console.log("tokenMetadata", tokenMetadata);
+  const marketCap = await getTokenMarketCap(client, greenCurveAddress);
 
   const token: TokenDetails = {
     creator: "",
     tokenAddress,
-    greenCurveAddress: "",
-    latitude: 0,
-    longitude: 0,
-    imageHash: "",
-    name: results[0].result || "",
-    symbol: results[1].result || "",
-    description: "",
-    marketCap: "",
+    greenCurveAddress: greenCurveAddress || "",
+    latitude: tokenMetadata.latitude || 0,
+    longitude: tokenMetadata.longitude || 0,
+    imageHash: tokenMetadata.imageHash || "",
+    name,
+    symbol,
+    totalSupply: totalSupply,
+    description: tokenMetadata.description || "",
+    marketCap: marketCap || "",
+    decimals,
   };
-
-  // await 3 seconds
-  await new Promise((resolve) => setTimeout(resolve, 3000));
 
   return token;
 };

@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import clsx from "clsx";
 import MapboxPicker from "./MapboxPicker";
 import { ImageDropzoneInput } from "./shared/components";
 import { deployToken } from "./shared/helpers/deployToken";
 import { CreateToken } from "./shared/types";
+import { ReadableTx } from "./shared/components/ReadableTx";
 
 export default () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
   const {
     control,
     register,
@@ -13,13 +17,30 @@ export default () => {
     setValue,
     formState: { errors },
   } = useForm<CreateToken>();
-  const onSubmit: SubmitHandler<CreateToken> = (data) => {
+  const onSubmit: SubmitHandler<CreateToken> = async (data) => {
     console.log(data);
-    deployToken(data);
+    setIsSubmitting(true);
+    const transactionHash = await deployToken(data);
+    setIsSubmitting(false);
+    setTransactionHash(transactionHash);
   };
 
+  if (transactionHash) {
+    return (
+      <div>
+        <h1>Transaction Hash</h1>
+        <p>
+          <ReadableTx tx={transactionHash} />
+        </p>
+      </div>
+    );
+  }
+
+  if (isSubmitting) {
+    return <h1>Submitting...</h1>;
+  }
+
   return (
-    /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
     <form className="relative" onSubmit={handleSubmit(onSubmit)}>
       <div className="grid md:grid-cols-[250px_1fr] gap-4 mb-4">
         <div className="order-2 md:order-1">
@@ -29,16 +50,6 @@ export default () => {
             name="file"
             required={true}
           />
-
-          {/* <div
-            className="tooltip mr-2"
-            data-tip="Input coordinates or drag the pin to the desired location"
-          >
-            <div className="flex justify-center items-center cursor-pointer w-5 h-5 rounded-full bg-secondary font-bold">
-              ?
-            </div>
-          </div>
-          <strong>Choose location:</strong> */}
         </div>
         <div className="order-1 md:order-2">
           <label

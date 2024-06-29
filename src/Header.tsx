@@ -14,7 +14,7 @@ export default ({ showCreate = true }: HeaderProps) => {
   return (
     <>
       <header className="site-header flex flex-col fixed top-0 left-0 w-full z-40 p-4">
-        <div className="flex justify-between">
+        <div className="flex justify-between z-40">
           <Link to="/">
             <Logo />
           </Link>

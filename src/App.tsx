@@ -7,7 +7,7 @@ function App() {
   return (
     <>
       <Header />
-      <Mapbox className="h-svh w-full fixed top-0 left-0" />
+      <Mapbox className="h-svh w-full fixed top-0 left-0 relative" />
       {/* <Events /> */}
     </>
   );

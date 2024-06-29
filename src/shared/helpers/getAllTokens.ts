@@ -1,12 +1,10 @@
-import { Address, createPublicClient, http } from "viem";
+import { createPublicClient, http } from "viem";
 import { sepolia } from "viem/chains";
 import { greenLaunchpad } from "../../abi/GreenLaunchpad";
 import { GreenERC20 } from "../../abi/GreenERC20";
 import { TokenDeployedEvent, TokenDetails, TokenMetadata } from "../types";
-import { GreenCurve } from "../../abi/GreenCurve";
-import { formatBigInt } from "./formatBigInt";
-import { DECIMALS, MARKET_CAP_DECIMALS } from "../consts";
 import { getTokenMetadata } from "./getTokenMetadata";
+import { getTokenMarketCap } from "./getTokenMarketCap";
 
 export const getAllTokens = async (): Promise<TokenDetails[]> => {
   const client = createPublicClient({
@@ -27,8 +25,6 @@ export const getAllTokens = async (): Promise<TokenDetails[]> => {
       eventName: "TokenDeployed",
       fromBlock: 0n,
     });
-
-    console.log("tokenDeployedEvents", tokenDeployedEvents);
 
     return tokenDeployedEvents as Array<{
       args: TokenDeployedEvent;
@@ -52,6 +48,7 @@ export const getAllTokens = async (): Promise<TokenDetails[]> => {
       if (metadata) {
         let name: string;
         let symbol: string;
+        let totalSupply: BigInt;
         let marketCap: string;
 
         name = await client.readContract({
@@ -66,7 +63,16 @@ export const getAllTokens = async (): Promise<TokenDetails[]> => {
           functionName: "symbol",
         });
 
-        marketCap = await getTokenMarketCap(event.args.greenCurveAddress);
+        totalSupply = await client.readContract({
+          address: event.args.tokenAddress,
+          abi: GreenERC20,
+          functionName: "totalSupply",
+        });
+
+        marketCap = await getTokenMarketCap(
+          client,
+          event.args.greenCurveAddress
+        );
 
         token = {
           creator: event.args.creator,
@@ -77,6 +83,7 @@ export const getAllTokens = async (): Promise<TokenDetails[]> => {
           imageHash: metadata?.imageHash || "",
           name,
           symbol,
+          totalSupply: totalSupply.toString(),
           description: metadata?.description || "",
           marketCap,
         };
@@ -87,18 +94,6 @@ export const getAllTokens = async (): Promise<TokenDetails[]> => {
     const filteredTokens = removeTokensWithBrokenMetadata(tokens);
 
     return filteredTokens;
-  };
-
-  const getTokenMarketCap = async (
-    greenCurveAddress: Address
-  ): Promise<string> => {
-    const marketCap = await client.readContract({
-      address: greenCurveAddress,
-      abi: GreenCurve,
-      functionName: "marketCap",
-    });
-
-    return formatBigInt(marketCap, DECIMALS, MARKET_CAP_DECIMALS);
   };
 
   const removeTokensWithBrokenMetadata = async (tokens: TokenDetails[]) => {

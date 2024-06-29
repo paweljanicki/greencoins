@@ -8,7 +8,14 @@ interface State {
 
 type Action =
   | { type: "SET_TOKENS"; payload: Array<TokenDetails> }
-  | { type: "SET_LOADING"; payload: boolean };
+  | { type: "SET_LOADING"; payload: boolean }
+  | {
+      type: "UPDATE_MARKET_CAP";
+      payload: {
+        greenCurveAddress: string;
+        marketCap: string;
+      };
+    };
 
 const initialState: State = {
   tokens: [],
@@ -21,6 +28,15 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, tokens: action.payload };
     case "SET_LOADING":
       return { ...state, loading: action.payload };
+    case "UPDATE_MARKET_CAP":
+      return {
+        ...state,
+        tokens: state.tokens.map((token) =>
+          token.greenCurveAddress === action.payload.greenCurveAddress
+            ? { ...token, marketCap: action.payload.marketCap }
+            : token
+        ),
+      };
     default:
       throw new Error("Unknown action type");
   }
