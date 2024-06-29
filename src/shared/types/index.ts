@@ -1,4 +1,4 @@
-import { Address, Hash } from "viem";
+import { Address } from "viem";
 
 // Event emitted when token is deployed
 export interface TokenDeployedEvent {

@@ -4,10 +4,9 @@ import { getPurchaseAmount } from "./getPurchaseAmount";
 import { Address, PublicClient } from "viem";
 import { formatBigInt } from "../shared/helpers/formatBigInt";
 import { DECIMALS } from "../shared/consts";
-import EthLogo from "./ethLogo";
 import { buyToken } from "./buyTokenFromBondingCurve";
 import { ReadableTx } from "../shared/components/ReadableTx";
-
+import EthLogo from "./EtherLogo";
 interface BuyTokenProps {
   tokenDetails: TokenDetails;
   client: PublicClient;

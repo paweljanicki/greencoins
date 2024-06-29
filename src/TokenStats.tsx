@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { Address, PublicClient } from "viem";
 import { getTokenPriceInEth } from "./shared/helpers/getTokenPriceInEth";
-import { TokenDetails, TokenPurchases } from "./shared/types";
+import { TokenDetails } from "./shared/types";
 import { DECIMALS } from "./shared/consts";
-import { getAllTokenPurchases } from "./shared/helpers/getAllTokenPurchases";
 import { formatBigInt } from "./shared/helpers/formatBigInt";
 import { ReadableAddress } from "./shared/components/ReadableAddress";
 
@@ -14,15 +13,10 @@ interface TokenStatsProps {
 
 export default ({ client, tokenDetails }: TokenStatsProps) => {
   const [priceInEth, setPriceInEth] = useState<string>("");
-  const [purchases, setPurchases] = useState<TokenPurchases>({
-    buy: [],
-    sell: [],
-  });
   useEffect(() => {
     if (!tokenDetails.greenCurveAddress) return;
 
     fetchPrice();
-    fetchPurchases();
   }, [tokenDetails]);
 
   const fetchPrice = async () => {
@@ -33,17 +27,6 @@ export default ({ client, tokenDetails }: TokenStatsProps) => {
     );
 
     setPriceInEth(price);
-  };
-
-  const fetchPurchases = async () => {
-    if (!tokenDetails.greenCurveAddress) return;
-
-    const data = await getAllTokenPurchases(
-      client,
-      tokenDetails.greenCurveAddress as Address
-    );
-
-    setPurchases(data);
   };
 
   return (
