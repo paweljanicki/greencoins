@@ -81,13 +81,45 @@ export const TokenTransactions = ({
               </div>
             </div>
           ) : (
-            <div>
-              <p>
-                Seller: <ReadableAddress address={purchase.args.seller} />
-              </p>
-              <p>ETH Out: {purchase.args.ethOut.toString()}</p>
-              <p>Fee: {purchase.args.fee.toString()}</p>
-              <p>Token In: {purchase.args.tokenIn.toString()}</p>
+            <div className="bg-neutral-600 rounded-md p-2 mb-2">
+              <div className="flex justify-between">
+                <p>
+                  <span className="text-accent">Token In: </span>
+
+                  {formatBigInt(
+                    purchase.args.tokenIn,
+                    tokenDetails.decimals || DECIMALS,
+                    2
+                  )}
+                </p>
+                <p>
+                  <span className="text-accent">ETH Out: </span>
+                  {formatBigInt(
+                    purchase.args.ethOut,
+                    tokenDetails.decimals || DECIMALS,
+                    2
+                  )}
+                </p>
+              </div>
+              <div className="flex mt-4">
+                <span className="mr-4">
+                  <span>Seller: </span>
+                  <ReadableAddress address={purchase.args.seller} />
+                </span>
+                <span>
+                  <span>Transaction: </span>
+                  <ReadableTx tx={purchase.transactionHash} />
+                </span>
+                <span className="ml-auto">
+                  <span>Green Fee: </span>
+                  {formatBigInt(
+                    purchase.args.fee,
+                    tokenDetails.decimals || DECIMALS,
+                    2
+                  )}{" "}
+                  {tokenDetails.symbol}
+                </span>
+              </div>
             </div>
           )}
         </div>

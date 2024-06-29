@@ -47,10 +47,11 @@ export default ({ tokenDetails, client }: SellTokenProps): JSX.Element => {
       return;
     }
 
-    sellToken({
+    await sellToken({
       greenCurveAddress: tokenDetails.greenCurveAddress as Address,
       tokenIn: amount,
       tokenDecimals: tokenDetails.decimals || DECIMALS,
+      tokenAddress: tokenDetails.tokenAddress as Address,
     });
   };
 
