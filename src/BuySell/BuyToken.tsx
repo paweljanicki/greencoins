@@ -6,6 +6,7 @@ import { formatBigInt } from "../shared/helpers/formatBigInt";
 import { DECIMALS } from "../shared/consts";
 import EthLogo from "./ethLogo";
 import { buyToken } from "./buyTokenFromBondingCurve";
+import { ReadableTx } from "../shared/components/ReadableTx";
 
 interface BuyTokenProps {
   tokenDetails: TokenDetails;
@@ -15,6 +16,9 @@ interface BuyTokenProps {
 export default ({ tokenDetails, client }: BuyTokenProps): JSX.Element => {
   const [amount, setAmount] = useState<number | undefined>(undefined);
   const [purchaseAmount, setPurchaseAmount] = useState<string>("0");
+  const [transactionHash, setTransactionHash] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -47,12 +51,25 @@ export default ({ tokenDetails, client }: BuyTokenProps): JSX.Element => {
       return;
     }
 
-    buyToken({
+    const hash = await buyToken({
       greenCurveAddress: tokenDetails.greenCurveAddress as Address,
       ethIn: amount,
       tokenDecimals: tokenDetails.decimals || DECIMALS,
     });
+
+    setAmount(undefined);
+    setPurchaseAmount("0");
+    setTransactionHash(hash);
   };
+
+  if (transactionHash) {
+    return (
+      <div className="grid gap-2">
+        <span>Transaction submitted:</span>
+        <ReadableTx tx={transactionHash} />
+      </div>
+    );
+  }
 
   return (
     <div>

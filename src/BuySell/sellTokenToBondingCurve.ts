@@ -34,5 +34,5 @@ export const sellToken = async ({
     args: [amountWithDecimals],
   });
   const hash = await writeContract(config, request);
-  return "sellToken" + hash;
+  return hash;
 };

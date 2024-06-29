@@ -53,10 +53,10 @@ export default () => {
   if (!token) return <div>Token not found</div>;
 
   return (
-    <div className="pt-[82px] p-4 bg-neutral text-neutral-content min-h-svh">
+    <div className="pt-[100px] p-4 bg-neutral text-neutral-content min-h-svh">
       <Header showCreate={false} />
       <div className="grid lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2">
+        <div className="order-2 lg:order-1 lg:col-span-2">
           <div className="p-4 rounded-xl border-2 border-neutral-content">
             <div className="mb-4">
               <h1 className="text-3xl font-bold text-secondary">
@@ -85,7 +85,7 @@ export default () => {
             <TokenTransactions tokenDetails={token} client={client} />
           </div>
         </div>
-        <div className="max-w-[500px]">
+        <div className="order-1 lg:order-2 max-w-[500px]">
           <BuySell tokenDetails={token} client={client} />
         </div>
       </div>

@@ -8,7 +8,6 @@ export const getTokenPriceInEth = async (
   decimals: number
 ): Promise<string> => {
   let result;
-  console.log("greenCurveAddress", greenCurveAddress);
   try {
     result = await client.readContract({
       address: greenCurveAddress,
@@ -19,8 +18,6 @@ export const getTokenPriceInEth = async (
     console.log("err", e);
     throw new Error("Failed to fetch token price");
   }
-
-  console.log("result", result);
 
   return formatBigInt(result, decimals, 4);
 };

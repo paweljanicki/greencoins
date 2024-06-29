@@ -36,12 +36,12 @@ export const TokenTransactions = ({
 
   return (
     <div className="p-4 rounded-xl border-2 border-neutral-content">
-      <h3>Transactions:</h3>
+      <h3 className="text-xl mb-4 text-secondary">Transactions:</h3>
       {purchases.map((purchase) => (
         <div key={purchase.transactionHash}>
           {purchase.type === "buy" ? (
             <div className="bg-neutral-600 rounded-md p-2 mb-2">
-              <div className="flex justify-between">
+              <div className="flex-col md:flex-row flex justify-between">
                 <p>
                   <span className="text-success">ETH In: </span>
 
@@ -60,7 +60,7 @@ export const TokenTransactions = ({
                   )}
                 </p>
               </div>
-              <div className="flex mt-4">
+              <div className="flex-col md:flex-row flex mt-4">
                 <span className="mr-4">
                   <span>Buyer: </span>
                   <ReadableAddress address={purchase.args.buyer} />
@@ -69,7 +69,7 @@ export const TokenTransactions = ({
                   <span>Transaction: </span>
                   <ReadableTx tx={purchase.transactionHash} />
                 </span>
-                <span className="ml-auto">
+                <span className="md:ml-auto">
                   <span>Green Fee: </span>
                   {formatBigInt(
                     purchase.args.fee,
@@ -82,7 +82,7 @@ export const TokenTransactions = ({
             </div>
           ) : (
             <div className="bg-neutral-600 rounded-md p-2 mb-2">
-              <div className="flex justify-between">
+              <div className="flex-col md:flex-row flex justify-between">
                 <p>
                   <span className="text-accent">Token In: </span>
 
@@ -101,7 +101,7 @@ export const TokenTransactions = ({
                   )}
                 </p>
               </div>
-              <div className="flex mt-4">
+              <div className="flex-col md:flex-row flex mt-4">
                 <span className="mr-4">
                   <span>Seller: </span>
                   <ReadableAddress address={purchase.args.seller} />
@@ -110,7 +110,7 @@ export const TokenTransactions = ({
                   <span>Transaction: </span>
                   <ReadableTx tx={purchase.transactionHash} />
                 </span>
-                <span className="ml-auto">
+                <span className="md:ml-auto">
                   <span>Green Fee: </span>
                   {formatBigInt(
                     purchase.args.fee,

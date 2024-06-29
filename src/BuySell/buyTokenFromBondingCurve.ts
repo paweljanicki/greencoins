@@ -19,5 +19,5 @@ export const buyToken = async ({
     value: BigInt(ethIn * 10 ** tokenDecimals),
   });
   const hash = await writeContract(config, request);
-  return "buyToken" + hash;
+  return hash;
 };

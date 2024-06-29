@@ -6,6 +6,7 @@ import { DECIMALS } from "../shared/consts";
 import { getSellAmount } from "./getSellAmount";
 import { getIpfsLink } from "../shared/helpers/getIpfsLink";
 import { sellToken } from "./sellTokenToBondingCurve";
+import { ReadableTx } from "../shared/components/ReadableTx";
 
 interface SellTokenProps {
   tokenDetails: TokenDetails;
@@ -15,6 +16,9 @@ interface SellTokenProps {
 export default ({ tokenDetails, client }: SellTokenProps): JSX.Element => {
   const [amount, setAmount] = useState<number | undefined>(undefined);
   const [purchaseAmount, setPurchaseAmount] = useState<string>("0");
+  const [transactionHash, setTransactionHash] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -47,13 +51,26 @@ export default ({ tokenDetails, client }: SellTokenProps): JSX.Element => {
       return;
     }
 
-    await sellToken({
+    const hash = await sellToken({
       greenCurveAddress: tokenDetails.greenCurveAddress as Address,
       tokenIn: amount,
       tokenDecimals: tokenDetails.decimals || DECIMALS,
       tokenAddress: tokenDetails.tokenAddress as Address,
     });
+
+    setAmount(undefined);
+    setPurchaseAmount("0");
+    setTransactionHash(hash);
   };
+
+  if (transactionHash) {
+    return (
+      <div>
+        <p>Transaction Hash: </p>
+        <ReadableTx tx={transactionHash} />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -75,7 +92,7 @@ export default ({ tokenDetails, client }: SellTokenProps): JSX.Element => {
           />
         </div>
       </label>
-      <p>You will get {purchaseAmount} ETH</p>
+      <p>You will get: {purchaseAmount} ETH</p>
 
       <button onClick={placeTrade} className="btn btn-info w-full mt-4">
         Place Trade
